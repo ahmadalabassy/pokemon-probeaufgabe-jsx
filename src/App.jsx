@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import Results from './Results'
+import Results from './components/Results'
 import './App.css'
 
 const path = `https://pokeapi.co/api/v2`
@@ -67,7 +67,7 @@ export default function App() {
   return (
     <div className="App">
       <header>
-        <img src='./pokémon_logo.svg' href="Pokémon Logo"/>
+        <img src='./pokémon_logo.svg' href="Pokémon Logo" alt="Pokémon"/>
       </header>
       <main>
         <div className='controls'>
