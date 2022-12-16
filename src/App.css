@@ -54,6 +54,10 @@ header, footer, main {
   width: 90%;
 }
 
+header img {
+  max-width: 100%;
+}
+
 header, main {  
   margin: 0 auto
 }
@@ -63,20 +67,10 @@ main {
 }
 
 footer {
-  background-color: #182849;
-  color: white;
-  margin: auto auto 0;
-}
-
-.btn {
-  cursor: pointer;
-  font-family: inherit;
   background-color: var(--accent-blue);
   color: white;
-  font-weight: 700;
-  border: none;
-  border-radius: 3px;
-  padding: .75em 1.5em;
+  border-radius: 3px 3px 0 0;
+  margin: auto auto 0;
 }
 
 .controls {
@@ -84,17 +78,12 @@ footer {
   gap: 1em;
 }
 
-.filter-options, .pokemon {
+.accordion-body, .pokemon {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   justify-items: start;
   align-items: center;
   column-gap: 2em;
-}
-
-.smooth-transition {
-  transition: height 600ms ease-in-out,
-              opacity 600ms ease-in-out;
 }
 
 .filter-options, .sort-options {
@@ -102,31 +91,25 @@ footer {
   align-items: center;
   row-gap: .5em;
   margin-block: 1em;
-  height: 0;
-  min-height: 0;
   overflow: hidden;
   opacity: 0;
-}
-
-.sort-options {
-
-
 }
 
 .show {
   opacity: 1;
 }
 
-.filter-options.show {
-  height: 8em;
-}
-
-.sort-options.show {
-  height: 4em;
-}
-
-.filter-checkbox {
+.filter-checkbox, .sort-checkbox {
   margin: 0 6px;
+}
+
+.type-group, section.pokemon {
+  margin-top: 3em;
+}
+
+.type-group-title {
+  color: #182849;
+  margin-bottom: .5em;
 }
 
 .pokemon {
