@@ -1,0 +1,1 @@
+All `.svg` files are cloned from: [https://github.com/PokeAPI/sprites/tree/master/sprites/pokemon/other/dream-world](https://github.com/PokeAPI/sprites/tree/master/sprites/pokemon/other/dream-world)
