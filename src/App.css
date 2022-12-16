@@ -73,11 +73,6 @@ footer {
   margin: auto auto 0;
 }
 
-.controls {
-  display: flex;
-  gap: 1em;
-}
-
 .accordion-body, .pokemon {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -101,6 +96,7 @@ footer {
 
 .filter-checkbox, .sort-checkbox {
   margin: 0 6px;
+  cursor: pointer;
 }
 
 .type-group, section.pokemon {
@@ -157,6 +153,7 @@ footer {
   color: white;
   position: absolute;
   bottom: -.5em;
+  margin: 0;
   left: 0;
   z-index: 3;
   background-color: #182849;
