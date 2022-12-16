@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
+import { addClass, removeClass } from './utils'
 import Results from './components/Results'
+import Controls from './components/Controls'
+import LoadMore from './components/LoadMore'
 
 // Import Bootstrap's JS
 import * as bootstrap from 'bootstrap'
@@ -61,7 +64,7 @@ export default function App() {
       .then(({results}) => {
         setPokemon(prev => {
           addTypeToPokemon(results, types, allPokemonGroupedByType)
-          return JSON.parse(JSON.stringify(prev)).concat(results)
+          return prev.concat(results)
         })
       })
     }
@@ -84,48 +87,9 @@ export default function App() {
     })
   }
 
-  function removeClass(element, cssClass) {
-    element && element.classList.remove(cssClass)
-  }
-
-  function addClass(element, cssClass) {
-    element && element.classList.add(cssClass)
-  }
-
   function getAlias(name) {
     return types.find(([type]) => type === name)[1]
   }
-
-  // create React elements for Pokemon types
-  const typeOptions = types.map(([name, alias]) => 
-    <div key={name} className="option">
-      <input
-        className="filter-checkbox"
-        type="checkbox"
-        checked={filter[name]}
-        id={name}
-        onChange={() => setFilter(prev => ({...prev, [name]: !prev[name]}))}
-      ></input>
-      <label className="filter-label" htmlFor={name}>{alias}</label>
-    </div>
-  )
-
-  const sortOptions = [
-    {name: 'ascending', alias: 'A → Z'},
-    {name: 'descending', alias: 'Z → A'},
-    {name: 'byType', alias: 'Nach Typ'}
-  ].map(({name, alias}, index) =>
-    <div key={index} className="option">
-      <input
-        className="sort-checkbox"
-        type="checkbox"
-        checked={sort[name]}
-        id={name}
-        onChange={() => handleSort(name)}
-      ></input>
-      <label className="sort-label" htmlFor={name}>{alias}</label>
-    </div>
-  )
   
   return (
     <div className="App">
@@ -133,41 +97,13 @@ export default function App() {
         <img src='./pokémon_logo.svg' href="Pokémon Logo" alt="Pokémon"/>
       </header>
       <main>
-      <div className="accordion controls">
-        <div className="accordion-item">
-          <h2 className="accordion-header" id="headingFilter">
-            <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#filter-options"
-              aria-expanded="false"
-              aria-controls="filter-options"
-            >
-              Filtern
-            </button>
-          </h2>
-          <div id="filter-options" className="accordion-collapse collapse" aria-labelledby="headingFilter" data-bs-parent=".controls">
-            <div className="accordion-body">{typeOptions}</div>
-          </div>
-        </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header" id="headingSort">
-            <button
-              className="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#sort-options"
-              aria-expanded="false" aria-controls="sort-options"
-            >
-              Sortieren
-            </button>
-          </h2>
-          <div id="sort-options" className="accordion-collapse collapse" aria-labelledby="headingSort" data-bs-parent=".controls">
-            <div className="accordion-body">{sortOptions}</div>
-          </div>
-        </div>
-      </div>
+        <Controls
+          types={types}
+          applyFilter={name => setFilter(prev => ({...prev, [name]: !prev[name]}))}
+          handleSort={name => handleSort(name)}
+          sort={sort}
+          filter={filter}
+        />
         <Results
           filter={filter}
           sort={sort}
@@ -177,14 +113,7 @@ export default function App() {
           addClass={addClass}
           getAlias={getAlias}
         />
-      {
-        offset < 450 && 
-        <button
-          className='btn btn-primary load-more'
-          onClick={() => setOffset(prev => prev + limit)}
-        >
-          Mehr laden
-        </button>}
+        <LoadMore offset={offset} updateOffset={() => setOffset(prev => prev + limit)} />
       </main>
       <footer>Probeaufgabe | Solongo</footer>
     </div>
