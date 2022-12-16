@@ -19,6 +19,8 @@ export default function Results({pokemon, filter, sort, removeClass, addClass, g
 
   // create React elements for Pokemon characters
   function constructElements() {
+    if(!!!pokemon.length) return <div className="loading">Loading...</div>
+
     addClass(sectionRef.current, "pokemon")
     const areFiltersApplied = !!checkedTypes.length
     const availableTypes = areFiltersApplied ? checkedTypes : Object.keys(filter)
@@ -66,7 +68,7 @@ export default function Results({pokemon, filter, sort, removeClass, addClass, g
   }
 
   return (
-    <section ref={sectionRef} className="pokemon">
+    <section ref={sectionRef}>
     {constructElements()}
     </section>
   )

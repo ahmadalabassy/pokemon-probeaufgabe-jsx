@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import Results from './components/Results'
 
-// Import our custom CSS
+// Import Bootstrap's JS
+import * as bootstrap from 'bootstrap'
+// Import styles
+import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 
-// Import needed Bootstrap's JS
-import * as bootstrap from 'bootstrap'
-
-import 'bootstrap/dist/css/bootstrap.min.css'
 const path = `https://pokeapi.co/api/v2`
 const limit = 150
 
@@ -17,10 +16,11 @@ export default function App() {
   const [allPokemonGroupedByType, setAllPokemonGroupedByType] = useState({})
   const [filter, setFilter] = useState({})
   const [sort, setSort] = useState(() => ({ascending: false, descending: false, byType: false}))
-
-  // fetch pokemon characters and pokemon types
+  const [offset, setOffset] = useState(0)
+  
+  // fetch pokemon characters and pokemon types at initial render
   useEffect(() => {
-    const endPoints = [`/pokemon/?limit=${limit}`, `/type`]
+    const endPoints = [`/pokemon/?offset=${offset}&limit=${limit}`, `/type`]
     const fetchArr = endPoints.map(point => fetch(`${path}${point}`))
     const updatedTypes = []
     const typeFetchArr = []
@@ -43,12 +43,7 @@ export default function App() {
         }
       }))
       .finally(() => {
-        updatedPokemon.forEach(pokemon => {
-          updatedTypes.forEach(([type]) => {
-            if(updatedAllPokemonGroupedByType[type].find(({pokemon: character}) => pokemon.name === character.name))
-              pokemon.types = pokemon.types ? [...pokemon.types, type] : [type]
-          })
-        })
+        addTypeToPokemon(updatedPokemon, updatedTypes, updatedAllPokemonGroupedByType)
         setPokemon(updatedPokemon)
         setTypes(updatedTypes)
         setFilter(updatedFilter)
@@ -58,12 +53,35 @@ export default function App() {
     .catch(error => console.error(error))
   }, [])
 
+  // fetch more pokemon characters when load more button is clicked
+  useEffect(() => {
+    if(offset >= limit) {
+      fetch(`${path}/pokemon/?offset=${offset}&limit=${limit}`)
+      .then(response => response.json())
+      .then(({results}) => {
+        setPokemon(prev => {
+          addTypeToPokemon(results, types, allPokemonGroupedByType)
+          return JSON.parse(JSON.stringify(prev)).concat(results)
+        })
+      })
+    }
+  }, [offset])
+
   function handleSort(name) {
     if(name === 'ascending') setSort(prev => ({...prev, [name]: !prev[name], descending: false}))
     else if(name === 'descending') setSort(prev => ({...prev, [name]: !prev[name], ascending: false}))
     else {
       setSort(prev => ({...prev, [name]: !prev[name]}))
     }
+  }
+
+  function addTypeToPokemon(pokemonArr, typesArr, groupsArr) {
+    pokemonArr.forEach(pokemon => {
+      typesArr.forEach(([type]) => {
+        if(groupsArr[type].find(({pokemon: character}) => pokemon.name === character.name))
+          pokemon.types = pokemon.types ? [...pokemon.types, type] : [type]
+      })
+    })
   }
 
   function removeClass(element, cssClass) {
@@ -80,7 +98,7 @@ export default function App() {
 
   // create React elements for Pokemon types
   const typeOptions = types.map(([name, alias]) => 
-    <div key={name}>
+    <div key={name} className="option">
       <input
         className="filter-checkbox"
         type="checkbox"
@@ -88,7 +106,7 @@ export default function App() {
         id={name}
         onChange={() => setFilter(prev => ({...prev, [name]: !prev[name]}))}
       ></input>
-      <label htmlFor={name}>{alias}</label>
+      <label className="filter-label" htmlFor={name}>{alias}</label>
     </div>
   )
 
@@ -97,7 +115,7 @@ export default function App() {
     {name: 'descending', alias: 'Z → A'},
     {name: 'byType', alias: 'Nach Typ'}
   ].map(({name, alias}, index) =>
-    <div key={index}>
+    <div key={index} className="option">
       <input
         className="sort-checkbox"
         type="checkbox"
@@ -105,7 +123,7 @@ export default function App() {
         id={name}
         onChange={() => handleSort(name)}
       ></input>
-      <label htmlFor={name}>{alias}</label>
+      <label className="sort-label" htmlFor={name}>{alias}</label>
     </div>
   )
   
@@ -125,7 +143,8 @@ export default function App() {
               data-bs-target="#filter-options"
               aria-expanded="false"
               aria-controls="filter-options"
-            >Filtern
+            >
+              Filtern
             </button>
           </h2>
           <div id="filter-options" className="accordion-collapse collapse" aria-labelledby="headingFilter" data-bs-parent=".controls">
@@ -158,6 +177,14 @@ export default function App() {
           addClass={addClass}
           getAlias={getAlias}
         />
+      {
+        offset < 450 && 
+        <button
+          className='btn btn-primary load-more'
+          onClick={() => setOffset(prev => prev + limit)}
+        >
+          Mehr laden
+        </button>}
       </main>
       <footer>Probeaufgabe | Solongo</footer>
     </div>
