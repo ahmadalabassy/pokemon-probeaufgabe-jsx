@@ -6,16 +6,16 @@ const sortAliases = [
     {name: 'byType', alias: 'Nach Typ'}
 ]
 
-export default function Controls({types, applyFilter, handleSort, sort, filter}) {
+export default function Controls({types, applyFilter, handleSort, sort, filter}) {    
     // create React elements for Pokemon types
-    const typeOptions = useMemo(() => types.map(([name, alias]) => 
+    const typeOptions = useMemo(() => types.map(([name, alias]) =>
         <div key={name} className="option">
             <input
-            className="filter-checkbox"
-            type="checkbox"
-            checked={filter[name]}
-            id={name}
-            onChange={() => applyFilter(name)}
+                className="filter-checkbox"
+                type="checkbox"
+                checked={filter[name]}
+                id={name}
+                onChange={() => applyFilter(name)}
             ></input>
             <label className="filter-label" htmlFor={name}>{alias}</label>
         </div>
