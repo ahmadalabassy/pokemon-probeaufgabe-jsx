@@ -1,9 +1,11 @@
-export default function Pokemon({name, pokemonId}) {
+import { capitalize } from "../utils"
+
+export default function Pokemon({name, id, openModal}) {
     return (
-        <div className="character">
-            <h2 className="character-name">{name[0].toUpperCase() + name.substring(1)}</h2>
-            <img className="character-img" src={`./pokemon/${pokemonId}.svg`} href={name} alt={name}/>
-            <p className="character-number">{pokemonId}</p>
+        <div className="character"onClick={openModal} data-bs-toggle="modal" data-bs-target="#modal">
+            <h2 className="character-name">{capitalize(name)}</h2>
+            <img className="character-img" src={`./pokemon/${id}.svg`} alt={name}/>
+            <p className="character-number">{id}</p>
         </div>
     )
 }

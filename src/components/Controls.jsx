@@ -1,6 +1,14 @@
+import { useMemo } from 'react'
+
+const sortAliases = [
+    {name: 'ascending', alias: 'A → Z'},
+    {name: 'descending', alias: 'Z → A'},
+    {name: 'byType', alias: 'Nach Typ'}
+]
+
 export default function Controls({types, applyFilter, handleSort, sort, filter}) {
     // create React elements for Pokemon types
-    const typeOptions = types.map(([name, alias]) => 
+    const typeOptions = useMemo(() => types.map(([name, alias]) => 
         <div key={name} className="option">
             <input
             className="filter-checkbox"
@@ -11,13 +19,9 @@ export default function Controls({types, applyFilter, handleSort, sort, filter})
             ></input>
             <label className="filter-label" htmlFor={name}>{alias}</label>
         </div>
-    )
+    ), [filter])
 
-    const sortOptions = [
-        {name: 'ascending', alias: 'A → Z'},
-        {name: 'descending', alias: 'Z → A'},
-        {name: 'byType', alias: 'Nach Typ'}
-    ].map(({name, alias}, index) =>
+    const sortOptions = useMemo(() => sortAliases.map(({name, alias}, index) =>
         <div key={index} className="option">
         <input
             className="sort-checkbox"
@@ -28,7 +32,7 @@ export default function Controls({types, applyFilter, handleSort, sort, filter})
         ></input>
         <label className="sort-label" htmlFor={name}>{alias}</label>
         </div>
-    )
+    ), [sort])
 
     return(
         <div className="accordion controls">
