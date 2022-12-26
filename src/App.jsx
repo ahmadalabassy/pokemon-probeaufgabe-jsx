@@ -127,8 +127,8 @@ export default function App() {
 				updateOffset={updateOffset}
 			/>}
 		</main>
-		<aside>{pokemonToOpenInModal.isOpen && modalData && <DetailedView modalData={modalData} getAlias={getAlias} />}</aside>
 		<footer>Probeaufgabe | Solongo</footer>
+		{pokemonToOpenInModal.isOpen && modalData && <DetailedView modalData={modalData} getAlias={getAlias} />}
 		</div>
 	)
 }
