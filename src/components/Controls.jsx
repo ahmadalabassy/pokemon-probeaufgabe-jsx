@@ -19,7 +19,7 @@ export default function Controls({applyFilter, filter, handleSort, sort, types})
             ></input>
             <label className="filter-label" htmlFor={name}>{alias}</label>
         </div>
-    ), [filter])
+    ), [filter, types])
 
     const sortOptions = useMemo(() => sortAliases.map(({name, alias}, index) =>
         <div key={index} className="option">

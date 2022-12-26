@@ -113,7 +113,7 @@ export default function App() {
 				handleSort={name => handleSort(name)}
 				sort={sort}
 				types={types}
-			/>, [filter, sort])}
+			/>, [filter, sort, types])}
 			{useMemo(() => <Results
 				filter={filter}
 				getAlias={getAlias}
