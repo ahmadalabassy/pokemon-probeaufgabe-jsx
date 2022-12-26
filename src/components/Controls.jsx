@@ -6,7 +6,7 @@ const sortAliases = [
     {name: 'byType', alias: 'Nach Typ'}
 ]
 
-export default function Controls({types, applyFilter, handleSort, sort, filter}) {    
+export default function Controls({applyFilter, filter, handleSort, sort, types}) {    
     // create React elements for Pokemon types
     const typeOptions = useMemo(() => types.map(([name, alias]) =>
         <div key={name} className="option">

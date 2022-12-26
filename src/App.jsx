@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useCallback, useEffect, useMemo,  useState } from 'react'
 
 import Controls from './components/Controls'
 import DetailedView from './components/DetailedView'
@@ -7,12 +7,13 @@ import Results from './components/Results'
 
 // Import needed Bootstrap JS plugins
 import { Dropdown, Modal } from 'bootstrap'
+
 // Import styles
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 
 const path = `https://pokeapi.co/api/v2`
-const limit = 150
+const limit = 50
 
 export default function App() {
 	const [pokemon, setPokemon] = useState([])
@@ -44,9 +45,9 @@ export default function App() {
 			.then(data => data.map(({name, names, pokemon}) => {
 				// inserts array of two, first the type name, second the type alias in German, types with no pokemon get excluded
 				if(!!pokemon.length) {
-				updatedTypes.push([name, names.find(({language}) => language.name == 'de').name])
-				updatedFilter = {...updatedFilter, [name]: false}
-				updatedAllPokemonGroupedByType = {...updatedAllPokemonGroupedByType, [name]: pokemon}
+					updatedTypes.push([name, names.find(({language}) => language.name == 'de').name])
+					updatedFilter = {...updatedFilter, [name]: false}
+					updatedAllPokemonGroupedByType = {...updatedAllPokemonGroupedByType, [name]: pokemon}
 				}
 			}))
 			.finally(() => {
@@ -90,12 +91,13 @@ export default function App() {
 	}
 
 	// controls functions for filtering and sorting
+	const applyFilter = useCallback(name => setFilter(prev => ({...prev, [name]: !prev[name]})), [filter])
+	const getAlias = useCallback(name => types.find(([type]) => type === name)[1], [types])
 	const handleSort = useCallback(name => {
 		if(name === 'ascending') setSort(prev => ({...prev, [name]: !prev[name], descending: false}))
 		else if(name === 'descending') setSort(prev => ({...prev, [name]: !prev[name], ascending: false}))
 		else setSort(prev => ({...prev, [name]: !prev[name]}))
 	}, [sort])
-	const getAlias = useCallback(name => types.find(([type]) => type === name)[1], [types])
 	const updateOffset = useCallback(() => setOffset(prev => prev + limit), [])
 
   	// modal functions for detailed view
@@ -106,12 +108,12 @@ export default function App() {
 		<header><img src='./pokémon_logo.svg' alt="Pokémon" width="272.7" height="100" /></header>
 		<main>
 			{useMemo(() => <Controls
-				applyFilter={name => setFilter(prev => ({...prev, [name]: !prev[name]}))}
+				applyFilter={applyFilter}
 				filter={filter}
 				handleSort={name => handleSort(name)}
 				sort={sort}
 				types={types}
-			/>, [sort, filter])}
+			/>, [filter, sort])}
 			{useMemo(() => <Results
 				filter={filter}
 				getAlias={getAlias}
@@ -125,7 +127,7 @@ export default function App() {
 				updateOffset={updateOffset}
 			/>}
 		</main>
-		<aside>{pokemonToOpenInModal.isOpen && <DetailedView modalData={modalData} />}</aside>
+		<aside>{pokemonToOpenInModal.isOpen && modalData && <DetailedView modalData={modalData} getAlias={getAlias} />}</aside>
 		<footer>Probeaufgabe | Solongo</footer>
 		</div>
 	)
