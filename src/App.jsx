@@ -128,7 +128,7 @@ export default function App() {
 			/>}
 		</main>
 		<footer>Probeaufgabe | Solongo</footer>
-		{pokemonToOpenInModal.isOpen && modalData && <DetailedView modalData={modalData} getAlias={getAlias} />}
+		{useMemo(() => <DetailedView modalData={modalData} getAlias={getAlias} />, [modalData])}
 		</div>
 	)
 }

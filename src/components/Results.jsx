@@ -9,7 +9,7 @@ export default function Results({filter, getAlias, isDataFetched, openModal, pok
 
 	const pokemonElement = ({name, url}) => {
 		const id = parseInt(url.split('//')[1].slice(0, -1).split('/').pop())
-		return <Pokemon key={id} id={id} name={name} openModal={() => openModal(id, url)} />
+		return <Pokemon key={id} id={id} name={name} openModal={openModal} url={url} />
 	}
 	const pokemonElements = matches => matches.map(match => pokemonElement(match))
 
