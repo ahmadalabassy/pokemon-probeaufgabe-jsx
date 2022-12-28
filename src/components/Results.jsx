@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { addClass, getCheckedKeys, removeClass } from '../utils'
+import { addClass, getCheckedKeys, getIdFromURL, removeClass, sortAscending, sortDescending } from '../utils'
 import Pokemon from './Pokemon'
 
 export default function Results({filter, getAlias, isDataFetched, openModal, pokemon, sort}) {
@@ -8,7 +8,7 @@ export default function Results({filter, getAlias, isDataFetched, openModal, pok
 	const checkedSort = useMemo(() => getCheckedKeys(sort), [sort])
 
 	const pokemonElement = ({name, url}) => {
-		const id = parseInt(url.split('//')[1].slice(0, -1).split('/').pop())
+		const id = getIdFromURL(url)
 		return <Pokemon key={id} id={id} name={name} openModal={openModal} url={url} />
 	}
 	const pokemonElements = matches => matches.map(match => pokemonElement(match))
@@ -32,11 +32,11 @@ export default function Results({filter, getAlias, isDataFetched, openModal, pok
     let order = 0  // 0: value not yet determined or no order specified, 1: alphabetically ascending, -1: alphabetically descending
     if(checkedSort.includes('ascending')) {
 		order = 1
-		data.sort(({name: a}, {name: b}) => a > b ? 1 : a < b ? -1 : 0)
+		sortAscending(data, 'name')
     }
     else if(checkedSort.includes('descending')) {
 		order = -1
-		data.sort(({name: a}, {name: b}) => a > b ? -1 : a < b ? 1 : 0)
+		sortDescending(data, 'name')
     }
     if(!!!checkedSort.includes('byType')) return pokemonElements(data)
     /* sorting by type

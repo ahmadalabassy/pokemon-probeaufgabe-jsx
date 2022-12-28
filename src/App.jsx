@@ -11,6 +11,7 @@ import { Dropdown, Modal } from 'bootstrap'
 // Import styles
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
+import { getIdFromURL, sortAscending } from './utils'
 
 const path = `https://pokeapi.co/api/v2`
 const limit = 50
@@ -18,7 +19,6 @@ const limit = 50
 export default function App() {
 	const [pokemon, setPokemon] = useState([])
 	const [types, setTypes] = useState([])
-	const [allPokemonGroupedByType, setAllPokemonGroupedByType] = useState({})
 	const [filter, setFilter] = useState({})
 	const [sort, setSort] = useState(() => ({ascending: false, descending: false, byType: false}))
 	const [offset, setOffset] = useState(0)
@@ -28,52 +28,42 @@ export default function App() {
 
 	// fetch pokemon characters and pokemon types at initial render
 	useEffect(() => {
-		const endPoints = [`/pokemon/?offset=${offset}&limit=${limit}`, `/type`]
-		const fetchArr = endPoints.map(point => fetch(`${path}${point}`))
-		const updatedTypes = []
+		const endPoint = [`/type`]
 		const typeFetchArr = []
+		const updatedTypes = []
+		const updatedPokemon = []
 		let updatedFilter = {}
-		let updatedAllPokemonGroupedByType = {}
-		let updatedPokemon
-		Promise.all(fetchArr)
-		.then(responses => Promise.all(responses.map(response => response.json())))
-		.then(([{results: pokemonData}, {results: typesData}]) => {
-			updatedPokemon = pokemonData
+		let allPokemonGroupedByType = {}
+		fetch(`${path}${endPoint}`)
+		.then(response => response.json())
+		.then(({results: typesData}) => {
 			typesData.forEach(({url}) => typeFetchArr.push(fetch(url)))
 			Promise.all(typeFetchArr)
 			.then(responses => Promise.all(responses.map(response => response.json())))
 			.then(data => data.map(({name, names, pokemon}) => {
-				// inserts array of two, first the type name, second the type alias in German, types with no pokemon get excluded
 				if(!!pokemon.length) {
+					for (const {pokemon: {name, url}} of pokemon) {
+						const id = getIdFromURL(url)
+						// only new characters are added, duplicates get skipped
+						!updatedPokemon.some(({id: pokemonId}) => pokemonId === id) 
+							&& updatedPokemon.push({name, url, id, isFavourite: false})
+					}
+					// inserts array of two, first the type name, second the type alias in German, types with no pokemon get excluded
 					updatedTypes.push([name, names.find(({language}) => language.name == 'de').name])
 					updatedFilter = {...updatedFilter, [name]: false}
-					updatedAllPokemonGroupedByType = {...updatedAllPokemonGroupedByType, [name]: pokemon}
+					allPokemonGroupedByType = {...allPokemonGroupedByType, [name]: pokemon}
 				}
 			}))
 			.finally(() => {
-				addTypeToPokemon(updatedPokemon, updatedTypes, updatedAllPokemonGroupedByType)
+				sortAscending(updatedPokemon, 'id')
+				addTypeToPokemon(updatedPokemon, updatedTypes, allPokemonGroupedByType)
 				setPokemon(updatedPokemon)
 				setTypes(updatedTypes)
 				setFilter(updatedFilter)
-				setAllPokemonGroupedByType(updatedAllPokemonGroupedByType)
 			})
 		})
 		.catch(error => console.error(error))
 	}, [])
-
-	// fetch more pokemon characters when load more button is clicked
-	useEffect(() => {
-		if(offset >= limit) {
-			fetch(`${path}/pokemon/?offset=${offset}&limit=${limit}`)
-			.then(response => response.json())
-			.then(({results}) => {
-				setPokemon(prev => {
-				addTypeToPokemon(results, types, allPokemonGroupedByType)
-				return prev.concat(results)
-				})
-			})
-		}
-	}, [offset])
 
   	// fetch pokemon by id for detailed view
 	useEffect(() => {
@@ -119,9 +109,9 @@ export default function App() {
 				getAlias={getAlias}
 				isDataFetched={isDataFetched}
 				openModal={openModal}
-				pokemon={pokemon}
+				pokemon={pokemon.slice(0, limit + offset)}
 				sort={sort}
-			/>, [filter, pokemon, sort])}
+			/>, [filter, pokemon, sort, offset])}
 			{isDataFetched && <LoadMore
 				offset={offset}
 				updateOffset={updateOffset}

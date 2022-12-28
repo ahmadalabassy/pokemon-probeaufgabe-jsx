@@ -13,6 +13,13 @@ function getCheckedKeys(obj) {
     , [])
 }
 
+function getIdFromURL(url) {
+    return parseInt(url.split('//')[1].slice(0, -1).split('/').pop())
+}
+
+const sortAscending = (arr, key) => arr.sort(({[key]: a}, {[key]: b}) => a > b ? 1 : a < b ? -1 : 0)
+const sortDescending = (arr, key) => arr.sort(({[key]: a}, {[key]: b}) => a > b ? -1 : a < b ? 1 : 0)
+
 const capitalize = name => name[0].toUpperCase() + name.substring(1)
 
-export { addClass, removeClass, getCheckedKeys, capitalize }
+export { addClass, capitalize, getCheckedKeys, getIdFromURL, removeClass, sortAscending, sortDescending }
