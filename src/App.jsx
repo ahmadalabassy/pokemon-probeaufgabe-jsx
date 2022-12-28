@@ -11,7 +11,7 @@ import { Dropdown, Modal } from 'bootstrap'
 // Import styles
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
-import { getIdFromURL, sortAscending } from './utils'
+import { getIdFromURL, sortArr } from './utils'
 
 const path = `https://pokeapi.co/api/v2`
 const limit = 50
@@ -19,6 +19,7 @@ const limit = 50
 export default function App() {
 	const [pokemon, setPokemon] = useState([])
 	const [types, setTypes] = useState([])
+	const [searchKeyword, setSearchKeyword] = useState('')
 	const [filter, setFilter] = useState({})
 	const [sort, setSort] = useState(() => ({ascending: false, descending: false, byType: false}))
 	const [offset, setOffset] = useState(0)
@@ -44,7 +45,7 @@ export default function App() {
 				if(!!pokemon.length) {
 					for (const {pokemon: {name, url}} of pokemon) {
 						const id = getIdFromURL(url)
-						// only new characters are added, duplicates get skipped
+						// only new characters get added, duplicates are skipped
 						!updatedPokemon.some(({id: pokemonId}) => pokemonId === id) 
 							&& updatedPokemon.push({name, url, id, isFavourite: false})
 					}
@@ -55,7 +56,7 @@ export default function App() {
 				}
 			}))
 			.finally(() => {
-				sortAscending(updatedPokemon, 'id')
+				sortArr(updatedPokemon, 'asc', 'id')
 				addTypeToPokemon(updatedPokemon, updatedTypes, allPokemonGroupedByType)
 				setPokemon(updatedPokemon)
 				setTypes(updatedTypes)
@@ -80,7 +81,7 @@ export default function App() {
 		})
 	}
 
-	// controls functions for filtering and sorting
+	// controls functions for search, filtering and sorting
 	const applyFilter = useCallback(name => setFilter(prev => ({...prev, [name]: !prev[name]})), [filter])
 	const getAlias = useCallback(name => types.find(([type]) => type === name)[1], [types])
 	const handleSort = useCallback(name => {
@@ -88,6 +89,7 @@ export default function App() {
 		else if(name === 'descending') setSort(prev => ({...prev, [name]: !prev[name], ascending: false}))
 		else setSort(prev => ({...prev, [name]: !prev[name]}))
 	}, [sort])
+	const narrowSearch = keyword => keyword === 'Pokémon' ? setSearchKeyword('') : setSearchKeyword(keyword)
 	const updateOffset = useCallback(() => setOffset(prev => prev + limit), [])
 
   	// modal functions for detailed view
@@ -101,6 +103,7 @@ export default function App() {
 				applyFilter={applyFilter}
 				filter={filter}
 				handleSort={name => handleSort(name)}
+				narrowSearch={narrowSearch}
 				sort={sort}
 				types={types}
 			/>, [filter, sort, types])}
@@ -110,9 +113,10 @@ export default function App() {
 				isDataFetched={isDataFetched}
 				openModal={openModal}
 				pokemon={pokemon.slice(0, limit + offset)}
+				searchKeyword={searchKeyword}
 				sort={sort}
-			/>, [filter, pokemon, sort, offset])}
-			{isDataFetched && <LoadMore
+			/>, [filter, pokemon, sort, offset, searchKeyword])}
+			{isDataFetched && !!!searchKeyword && <LoadMore
 				offset={offset}
 				updateOffset={updateOffset}
 			/>}
