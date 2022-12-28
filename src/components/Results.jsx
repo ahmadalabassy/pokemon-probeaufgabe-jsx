@@ -2,9 +2,8 @@ import { useMemo, useRef } from 'react'
 import { addClass, getCheckedKeys, removeClass, sortArr } from '../utils'
 import Pokemon from './Pokemon'
 
-export default function Results({filter, getAlias, isDataFetched, openModal, pokemon, searchKeyword, sort}) {
+export default function Results({filter, getAlias, isDataFetched, openModal, pokemon, sort}) {
 	const sectionRef = useRef(null)
-	const keyword = searchKeyword.toLowerCase()
 	const checkedTypes = useMemo(() => getCheckedKeys(filter), [filter])
 	const checkedSort = useMemo(() => getCheckedKeys(sort), [sort])
 
@@ -17,11 +16,8 @@ export default function Results({filter, getAlias, isDataFetched, openModal, pok
 		const areFiltersApplied = !!checkedTypes.length
 		const availableTypes = areFiltersApplied ? checkedTypes : Object.keys(filter)
 		let data = areFiltersApplied
-			? JSON.parse(JSON.stringify(pokemon)).filter(({types}) => checkedTypes.every(type => types.includes(type)))
-			: JSON.parse(JSON.stringify(pokemon))
-		
-		// narrowing further down data if search keyword is used
-		if(!!keyword) data = data.filter(({name, types}) => name.includes(keyword) || types.includes(keyword))
+			? pokemon.filter(({types}) => checkedTypes.every(type => types.includes(type)))
+			: pokemon
 		
 		// if no results match filter(s) applied; array is empty, dummy element is returned
 		if(!!!data.length) {

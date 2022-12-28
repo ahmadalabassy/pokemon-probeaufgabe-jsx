@@ -44,7 +44,7 @@ export default function Controls({applyFilter, filter, handleSort, narrowSearch,
                 <div className="input-group searchbar">
                     <span className="input-group-text" id="search-icon"><img src={searchIcon} alt="Such-Icon" /></span>
                     <div className="form-floating">
-                        <input ref={searchTextRef} type="text" className="form-control" aria-label="Suche" id="Suchtext" placeholder="Pokémon" onChange={() => narrowSearch(searchTextRef.current.value)}></input>
+                        <input ref={searchTextRef} type="text" className="form-control" aria-label="Suche" id="Suchtext" placeholder="pokémon" onChange={() => narrowSearch(searchTextRef.current.value.toLowerCase().trim())}></input>
                         <label htmlFor="Suchtext">Suche</label>
                     </div>
                 </div>

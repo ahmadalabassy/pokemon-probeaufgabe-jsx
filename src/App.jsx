@@ -17,7 +17,7 @@ const path = `https://pokeapi.co/api/v2`
 const limit = 50
 
 export default function App() {
-	const [pokemon, setPokemon] = useState([])
+	const [allPokemon, setAllPokemon] = useState([])
 	const [types, setTypes] = useState([])
 	const [searchKeyword, setSearchKeyword] = useState('')
 	const [filter, setFilter] = useState({})
@@ -25,14 +25,19 @@ export default function App() {
 	const [offset, setOffset] = useState(0)
 	const [modalData, setModalData] = useState(() => null)
 	const [pokemonToOpenInModal, setPokemonToOpenInModal] = useState(() => ({id: null, url: null, isOpen: false}))
-	const isDataFetched = !!pokemon.length
+	const isDataFetched = !!allPokemon.length
+	const pokemon = useMemo(() => JSON.parse(JSON.stringify((!!searchKeyword
+		? allPokemon.filter(({id, name, types}) => 
+			name.includes(searchKeyword) || types.includes(searchKeyword) || id.toString().includes(searchKeyword))
+		: allPokemon
+	))), [allPokemon, searchKeyword])
 
-	// fetch pokemon characters and pokemon types at initial render
+	// fetch all pokemon characters and pokemon types at initial render
 	useEffect(() => {
 		const endPoint = [`/type`]
 		const typeFetchArr = []
 		const updatedTypes = []
-		const updatedPokemon = []
+		const updatedAllPokemon = []
 		let updatedFilter = {}
 		let allPokemonGroupedByType = {}
 		fetch(`${path}${endPoint}`)
@@ -46,8 +51,8 @@ export default function App() {
 					for (const {pokemon: {name, url}} of pokemon) {
 						const id = getIdFromURL(url)
 						// only new characters get added, duplicates are skipped
-						!updatedPokemon.some(({id: pokemonId}) => pokemonId === id) 
-							&& updatedPokemon.push({name, url, id, isFavourite: false})
+						!updatedAllPokemon.some(({id: pokemonId}) => pokemonId === id) 
+							&& updatedAllPokemon.push({name, url, id, isFavourite: false})
 					}
 					// inserts array of two, first the type name, second the type alias in German, types with no pokemon get excluded
 					updatedTypes.push([name, names.find(({language}) => language.name == 'de').name])
@@ -56,9 +61,9 @@ export default function App() {
 				}
 			}))
 			.finally(() => {
-				sortArr(updatedPokemon, 'asc', 'id')
-				addTypeToPokemon(updatedPokemon, updatedTypes, allPokemonGroupedByType)
-				setPokemon(updatedPokemon)
+				sortArr(updatedAllPokemon, 'asc', 'id')
+				addTypeToPokemon(updatedAllPokemon, updatedTypes, allPokemonGroupedByType)
+				setAllPokemon(updatedAllPokemon)
 				setTypes(updatedTypes)
 				setFilter(updatedFilter)
 			})
@@ -89,9 +94,9 @@ export default function App() {
 		else if(name === 'descending') setSort(prev => ({...prev, [name]: !prev[name], ascending: false}))
 		else setSort(prev => ({...prev, [name]: !prev[name]}))
 	}, [sort])
-	const narrowSearch = keyword => keyword === 'Pokémon' ? setSearchKeyword('') : setSearchKeyword(keyword)
+	const narrowSearch = keyword => setSearchKeyword(keyword === 'pokémon'  ? '' : keyword)
 	const updateOffset = useCallback(() => setOffset(prev => prev + limit), [])
-
+	
   	// modal functions for detailed view
 	const openModal = useCallback((id, url) => setPokemonToOpenInModal({id, url, isOpen: true}), [pokemonToOpenInModal.id])
 
@@ -111,12 +116,14 @@ export default function App() {
 				filter={filter}
 				getAlias={getAlias}
 				isDataFetched={isDataFetched}
+				limit={limit}
+				offset={offset}
 				openModal={openModal}
 				pokemon={pokemon.slice(0, limit + offset)}
 				searchKeyword={searchKeyword}
 				sort={sort}
-			/>, [filter, pokemon, sort, offset, searchKeyword])}
-			{isDataFetched && !!!searchKeyword && <LoadMore
+			/>, [filter, allPokemon, sort, offset, searchKeyword])}
+			{isDataFetched && pokemon.length > offset + limit && <LoadMore
 				offset={offset}
 				updateOffset={updateOffset}
 			/>}
