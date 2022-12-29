@@ -1,6 +1,4 @@
-import { useMemo, useRef } from 'react'
-import searchIcon from '../assets/search.svg'
-import sliderIcon from '../assets/sliders.svg'
+import { useMemo } from 'react'
 
 const sortAliases = [
     {name: 'ascending', alias: 'A → Z'},
@@ -8,11 +6,10 @@ const sortAliases = [
     {name: 'byType', alias: 'Nach Typ'}
 ]
 
-export default function Controls({applyFilter, filter, handleSort, narrowSearch, sort, types}) {
-    const searchTextRef = useRef(null)
+export default function Controls({applyFilter, filter, filterByKeyword, handleSort, sort, toggleFilterByFavourites, types}) {
 
     // create React elements for Pokemon types
-    const typeOptions = useMemo(() => types.map(([name, alias]) =>
+    const $typeOptions = useMemo(() => types.map(([name, alias]) =>
         <div key={name} className="option">
             <input
                 className="filter-checkbox"
@@ -25,7 +22,7 @@ export default function Controls({applyFilter, filter, handleSort, narrowSearch,
         </div>
     ), [filter, types])
 
-    const sortOptions = useMemo(() => sortAliases.map(({name, alias}, index) =>
+    const $sortOptions = useMemo(() => sortAliases.map(({name, alias}, index) =>
         <div key={index} className="option">
         <input
             className="sort-checkbox"
@@ -40,15 +37,13 @@ export default function Controls({applyFilter, filter, handleSort, narrowSearch,
 
     return(
         <>
-            <div className="controls-header">
+            <div className="main-controls-header">
                 <div className="input-group searchbar">
-                    <span className="input-group-text" id="search-icon"><img src={searchIcon} alt="Such-Icon" /></span>
-                    <div className="form-floating">
-                        <input ref={searchTextRef} type="text" className="form-control" aria-label="Suche" id="Suchtext" placeholder="pokémon" onChange={() => narrowSearch(searchTextRef.current.value.toLowerCase().trim())}></input>
-                        <label htmlFor="Suchtext">Suche</label>
-                    </div>
+                    <span className="input-group-text" id="search-icon"><i className="bi bi-search"></i></span>
+                    <input type="text" className="form-control" id="search-input" aria-label="Suche" placeholder="Suche" onChange={event => filterByKeyword(event.target.value.toLowerCase().trim())}></input>
                 </div>
-                <button className="btn btn-primary settings" data-bs-toggle="collapse" data-bs-target="#filterAndSortControls" aria-expanded="false" aria-controls="filterAndSortControls"><img src={sliderIcon} alt="Einstellungen" /></button>
+                <button className="btn btn-primary favourites" onClick={toggleFilterByFavourites}><i className="bi bi-star-fill"></i></button>
+                <button className="btn btn-primary settings" data-bs-toggle="collapse" data-bs-target="#filterAndSortControls" aria-expanded="false" aria-controls="filterAndSortControls"><i className="bi bi-sliders"></i></button>
             </div>
             <div className="accordion collapse" id="filterAndSortControls">
                 <div className="accordion-item">
@@ -65,7 +60,7 @@ export default function Controls({applyFilter, filter, handleSort, narrowSearch,
                         </button>
                     </h2>
                     <div id="filter-options" className="accordion-collapse collapse" aria-labelledby="headingFilter" data-bs-parent=".controls">
-                        <div className="accordion-body">{typeOptions}</div>
+                        <div className="accordion-body">{$typeOptions}</div>
                     </div>
                 </div>
                 <div className="accordion-item">
@@ -81,7 +76,7 @@ export default function Controls({applyFilter, filter, handleSort, narrowSearch,
                         </button>
                     </h2>
                     <div id="sort-options" className="accordion-collapse collapse" aria-labelledby="headingSort" data-bs-parent=".controls">
-                        <div className="accordion-body">{sortOptions}</div>
+                        <div className="accordion-body">{$sortOptions}</div>
                     </div>
                 </div>
             </div>

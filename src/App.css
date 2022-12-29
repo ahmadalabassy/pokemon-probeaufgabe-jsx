@@ -73,6 +73,10 @@ header, footer, main {
     width: 90%;
 }
 
+header {
+    position: relative;
+}
+
 header img {
     max-width: 100%;
 }
@@ -110,7 +114,13 @@ footer {
     color: #fff;
 }
 
-.controls-header {
+.theme {
+    position: absolute;
+    top: 2em;
+    right: 0;
+}
+
+.main-controls-header {
     display: flex;
     gap: 1rem;
     padding-bottom: 1rem;
@@ -120,19 +130,37 @@ footer {
     background-color: var(--accent-blue);
     border-color: var(--accent-blue);
     padding: .5em 1.5em;
+    transition: background-color .15ms ease-in-out 0ms, border-color .15s ease-in-out 0ms;
+}
+
+.bi-search {
+    color: #fff;
 }
 
 .accordion-button {
     padding: .75rem 1.5rem;
 }
 
-.searchbar:has(.form-control:focus) {
+.searchbar:has(#search-input:focus) {
     box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
     border-radius: .375rem;
 }
 
-.form-control:focus {
+#search-icon:has(+ #search-input:focus) {
+    background-color: var(--accent-blue-hover);
+    border-color: var(--accent-blue-hover);
+}
+
+#search-input:focus {
     box-shadow: none;
+}
+
+.accordion.collapse {
+    visibility: hidden;
+}
+
+.accordion.collapse.show {
+    visibility: visible;
 }
 
 .accordion-body, .pokemon {
@@ -200,6 +228,22 @@ footer {
     right: 0;
     top: -1.5em;
     z-index: 2;
+}
+
+.character-fav {
+    height: 1.625rem;
+    color: var(--accent-yellow);
+    filter: drop-shadow(0 0 0.2rem #fff);
+    position: absolute;
+    top: .2rem;
+    right: .3rem;
+    opacity: 0;
+    transition: opacity .15ms ease-in-out 0ms;
+    z-index: 3;
+}
+
+.character-fav.show {
+    opacity: 1;
 }
 
 .character-img {

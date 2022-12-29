@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo,  useState } from 'react'
+import { getIdFromURL, sortArr } from './utils'
 
+// Import components
 import Controls from './components/Controls'
 import DetailedView from './components/DetailedView'
 import LoadMore from './components/LoadMore'
@@ -11,26 +13,35 @@ import { Dropdown, Modal } from 'bootstrap'
 // Import styles
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
-import { getIdFromURL, sortArr } from './utils'
 
 const path = `https://pokeapi.co/api/v2`
 const limit = 50
 
 export default function App() {
 	const [allPokemon, setAllPokemon] = useState([])
+	const [favourites, setFavourites] = useState(() => {
+		const storedFavs = localStorage.getItem('favourites')
+		return storedFavs ? JSON.parse(storedFavs) : []
+	})
 	const [types, setTypes] = useState([])
 	const [searchKeyword, setSearchKeyword] = useState('')
+	const [filterByFavourites, setFilterByFavourites] = useState(() => false)
 	const [filter, setFilter] = useState({})
 	const [sort, setSort] = useState(() => ({ascending: false, descending: false, byType: false}))
 	const [offset, setOffset] = useState(0)
 	const [modalData, setModalData] = useState(() => null)
 	const [pokemonToOpenInModal, setPokemonToOpenInModal] = useState(() => ({id: null, url: null, isOpen: false}))
 	const isDataFetched = !!allPokemon.length
-	const pokemon = useMemo(() => JSON.parse(JSON.stringify((!!searchKeyword
-		? allPokemon.filter(({id, name, types}) => 
-			name.includes(searchKeyword) || types.includes(searchKeyword) || id.toString().includes(searchKeyword))
-		: allPokemon
-	))), [allPokemon, searchKeyword])
+	// pokemon characters passed on to Results component for rendering
+	const pokemon = useMemo(() => JSON.parse(JSON.stringify((() => {
+		// narrow down matches through filter by favourites
+		const matches = filterByFavourites ? allPokemon.filter(({id}) => favourites.some(favId => favId === id)) : allPokemon
+		// further narrow down matches through search by keyword
+		return (!!searchKeyword
+			? matches.filter(({id, name, types}) =>
+				name.includes(searchKeyword) || types.includes(searchKeyword) || id.toString().includes(searchKeyword)) 
+			: matches)
+	})())), [allPokemon, favourites, filterByFavourites, searchKeyword])
 
 	// fetch all pokemon characters and pokemon types at initial render
 	useEffect(() => {
@@ -52,7 +63,7 @@ export default function App() {
 						const id = getIdFromURL(url)
 						// only new characters get added, duplicates are skipped
 						!updatedAllPokemon.some(({id: pokemonId}) => pokemonId === id) 
-							&& updatedAllPokemon.push({name, url, id, isFavourite: false})
+							&& updatedAllPokemon.push({id, name, url})
 					}
 					// inserts array of two, first the type name, second the type alias in German, types with no pokemon get excluded
 					updatedTypes.push([name, names.find(({language}) => language.name == 'de').name])
@@ -88,31 +99,43 @@ export default function App() {
 
 	// controls functions for search, filtering and sorting
 	const applyFilter = useCallback(name => setFilter(prev => ({...prev, [name]: !prev[name]})), [filter])
+	const filterByKeyword = keyword => setSearchKeyword(keyword)
 	const getAlias = useCallback(name => types.find(([type]) => type === name)[1], [types])
 	const handleSort = useCallback(name => {
 		if(name === 'ascending') setSort(prev => ({...prev, [name]: !prev[name], descending: false}))
 		else if(name === 'descending') setSort(prev => ({...prev, [name]: !prev[name], ascending: false}))
 		else setSort(prev => ({...prev, [name]: !prev[name]}))
 	}, [sort])
-	const narrowSearch = keyword => setSearchKeyword(keyword === 'pokémon'  ? '' : keyword)
 	const updateOffset = useCallback(() => setOffset(prev => prev + limit), [])
 	
+	// results functions
+	const toggleFavourite = id => {
+		const updatedFavs = favourites.includes(id) ? favourites.filter(favId => favId !== id) : [...favourites, id]
+		setFavourites(updatedFavs)
+		localStorage.setItem('favourites', JSON.stringify(updatedFavs))
+	}
+
   	// modal functions for detailed view
 	const openModal = useCallback((id, url) => setPokemonToOpenInModal({id, url, isOpen: true}), [pokemonToOpenInModal.id])
 
 	return (
 		<div className="App">
-		<header><img src='./pokémon_logo.svg' alt="Pokémon" width="272.7" height="100" /></header>
+		<header>
+			<img src='./pokémon_logo.svg' alt="Pokémon" width="272.7" height="100" />
+			<Theme theme={true} />
+		</header>
 		<main>
 			{useMemo(() => <Controls
 				applyFilter={applyFilter}
 				filter={filter}
+				filterByKeyword={filterByKeyword}
 				handleSort={name => handleSort(name)}
-				narrowSearch={narrowSearch}
 				sort={sort}
+				toggleFilterByFavourites={() => setFilterByFavourites(prev => !prev)}
 				types={types}
 			/>, [filter, sort, types])}
 			{useMemo(() => <Results
+				favourites={favourites}
 				filter={filter}
 				getAlias={getAlias}
 				isDataFetched={isDataFetched}
@@ -122,7 +145,8 @@ export default function App() {
 				pokemon={pokemon.slice(0, limit + offset)}
 				searchKeyword={searchKeyword}
 				sort={sort}
-			/>, [filter, allPokemon, sort, offset, searchKeyword])}
+				toggleFavourite={toggleFavourite}
+			/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
 			{isDataFetched && pokemon.length > offset + limit && <LoadMore
 				offset={offset}
 				updateOffset={updateOffset}
