@@ -6,6 +6,7 @@ import Controls from './components/Controls'
 import DetailedView from './components/DetailedView'
 import LoadMore from './components/LoadMore'
 import Results from './components/Results'
+import Theme from './components/Theme'
 
 // Import needed Bootstrap JS plugins
 import { Dropdown, Modal } from 'bootstrap'

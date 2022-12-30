@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import chevronUp from "../assets/chevron-double-up.svg"
+import { chevronDoubleUp } from "./icons"
 import { capitalize } from "../utils"
 
 export default function DetailedView({modalData, getAlias}) {
@@ -33,7 +33,7 @@ export default function DetailedView({modalData, getAlias}) {
                     <div className="modal-footer">
                         <button type="button" className="btn btn-primary" data-bs-dismiss="modal">Schließen</button>
                         <button type="button" className="btn btn-primary" aria-label="zum Seitenanfang scrollen" onClick={() => modalBodyRef.current.scrollTo({top: 0, behavior: 'smooth'})}>
-                            <img src={chevronUp} alt="chevron double up" />
+                            {chevronDoubleUp}
                         </button>
                     </div>
                 </div>

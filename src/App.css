@@ -230,21 +230,21 @@ footer {
     z-index: 2;
 }
 
-.character-fav {
+.bi-star-fill-yellow, .bi-star {
     height: 1.625rem;
+    width: 1.625rem;
     color: var(--accent-yellow);
     filter: drop-shadow(0 0 0.2rem #fff);
     position: absolute;
     top: .2rem;
     right: .3rem;
-    opacity: 0;
     transition: opacity .15ms ease-in-out 0ms;
     z-index: 3;
 }
 
-.character-fav.show {
+/* .character-fav.show {
     opacity: 1;
-}
+} */
 
 .character-img {
   position:relative;

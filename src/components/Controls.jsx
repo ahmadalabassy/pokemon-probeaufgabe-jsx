@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { search, sliders, starFilled } from './icons'
 
 const sortAliases = [
     {name: 'ascending', alias: 'A → Z'},
@@ -39,11 +40,11 @@ export default function Controls({applyFilter, filter, filterByKeyword, handleSo
         <>
             <div className="main-controls-header">
                 <div className="input-group searchbar">
-                    <span className="input-group-text" id="search-icon"><i className="bi bi-search"></i></span>
+                    <span className="input-group-text" id="search-icon">{search}</span>
                     <input type="text" className="form-control" id="search-input" aria-label="Suche" placeholder="Suche" onChange={event => filterByKeyword(event.target.value.toLowerCase().trim())}></input>
                 </div>
-                <button className="btn btn-primary favourites" onClick={toggleFilterByFavourites}><i className="bi bi-star-fill"></i></button>
-                <button className="btn btn-primary settings" data-bs-toggle="collapse" data-bs-target="#filterAndSortControls" aria-expanded="false" aria-controls="filterAndSortControls"><i className="bi bi-sliders"></i></button>
+                <button className="btn btn-primary favourites" onClick={toggleFilterByFavourites} aria-label="Fovoriten">{starFilled}</button>
+                <button className="btn btn-primary settings" data-bs-toggle="collapse" data-bs-target="#filterAndSortControls" aria-label="Einstellungen" aria-expanded="false" aria-controls="filterAndSortControls">{sliders}</button>
             </div>
             <div className="accordion collapse" id="filterAndSortControls">
                 <div className="accordion-item">
@@ -70,7 +71,8 @@ export default function Controls({applyFilter, filter, filterByKeyword, handleSo
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#sort-options"
-                            aria-expanded="false" aria-controls="sort-options"
+                            aria-expanded="false"
+                            aria-controls="sort-options"
                         >
                             Sortieren
                         </button>
