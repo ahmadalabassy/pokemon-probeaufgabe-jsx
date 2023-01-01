@@ -10,7 +10,7 @@
     --character-number: #fff;
     --character-number-bg: var(--accent-primary-hover);
     --character-bg: #ffcd053b;
-    --drop-shadow: #fff;
+    --drop-shadow: #C19F00;
     --footer-bg: var(--accent-primary);
     --scrollbar-thumb: var(--accent-primary);
     --scrollbar-thumb-hover: var(--accent-primary-hover);
@@ -29,7 +29,6 @@
     --bs-btn-disabled-color: #fff;
     --bs-btn-disabled-bg: #395FAA;
     --bs-btn-disabled-border-color: none;
-    --theme-toggler-shadow: var(--accent-primary)
 }
 
 :root[theme='dark'] {
@@ -47,15 +46,16 @@
     --scrollbar-thumb-hover: #638ad6;
     --searchbar-box-shadow: 0 0 0 0.25rem rgb(49 132 253 / 50%);
     --bs-border-color: var(--character-bg);
-    --bs-accordion-active-color: #fff;
-    --bs-accordion-active-color: #fff;
-    --theme-toggler-shadow: var(--accent-secondary)
 }
 
 /********** base styling **********/
 * {
     box-sizing: border-box;
     margin: 0;
+}
+
+:root[theme='dark'] body {
+    background: var(--bg);
 }
 
 .App {
@@ -179,6 +179,10 @@ footer {
     padding: .25rem .5rem;
     background: none;
     transition: all .15s ease-in-out 0s;
+}
+
+:root[theme='light'] .btn.theme-toggler > svg {
+    filter: drop-shadow(0 0 .1rem var(--drop-shadow));
 }
 
 :root[theme='dark'] .theme-toggler {
@@ -360,7 +364,7 @@ footer {
 .character-number,
 .accordion-button,
 #search-input, .modal-content, .accordion-body {
-    transition: background-color .5s ease-in-out 0s;
+    transition: background-color .15s ease-in-out 0s;
 }
 
 .bi-star-fill-yellow, .bi-star {
@@ -376,6 +380,10 @@ footer {
 }
 
 /********** modal styling **********/
+:root[theme='dark'] .modal-title {
+    color: var(--accent-secondary);
+}
+
 .modal-dialog {
     width: 90%;
     margin-left: auto;

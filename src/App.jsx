@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo,  useState } from 'react'
-import { getIdFromURL, maskScrollbar, sortArr } from './utils'
+import { getIdFromURL, sortArr } from './utils'
 
 // Import components
 import Controls from './components/Controls'
@@ -131,10 +131,7 @@ export default function App() {
 	}
 
   	// modal functions for detailed view
-	const openModal = useCallback((id, url) => {
-		theme === 'dark' && maskScrollbar()
-		setPokemonToOpenInModal({id, url, isOpen: true})
-	}, [pokemonToOpenInModal.id])
+	const openModal = useCallback((id, url) => setPokemonToOpenInModal({id, url, isOpen: true}), [pokemonToOpenInModal.id])
 
 	return (
 		<div className="App">
