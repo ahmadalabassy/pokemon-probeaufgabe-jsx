@@ -1,3 +1,5 @@
+const root = document.querySelector('html')
+const body = document.querySelector('body')
 
 const addClass = (element, cssClass) => element && element.classList.add(cssClass)
 const removeClass = (element, cssClass) => element && element.classList.remove(cssClass)
@@ -7,6 +9,11 @@ const getCheckedKeys = obj => obj && Object.entries(obj).reduce((checkedoptions,
     value ? checkedoptions.concat(key) : checkedoptions
 , [])
 const getIdFromURL = url => parseInt(url.split('//')[1].slice(0, -1).split('/').pop())
+
+const maskScrollbar = () => {
+    body.style.background = root.getAttribute('theme') === 'light' ? '#fff' : '#202124'
+}
+const restoreScrollbar = () => {}
 
 const sortArr = (arr, type, key) => { switch (type) {
     case 'desc':
@@ -18,4 +25,4 @@ const sortArr = (arr, type, key) => { switch (type) {
             : arr.sort((a, b) => a > b ? 1 : a < b ? -1 : 0)
 }}
 
-export { addClass, capitalize, getCheckedKeys, getIdFromURL, removeClass, sortArr }
+export { addClass, capitalize, getCheckedKeys, getIdFromURL, maskScrollbar, removeClass, restoreScrollbar, sortArr }

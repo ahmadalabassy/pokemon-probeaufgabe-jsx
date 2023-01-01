@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo,  useState } from 'react'
-import { getIdFromURL, sortArr } from './utils'
+import { getIdFromURL, maskScrollbar, sortArr } from './utils'
 
 // Import components
 import Controls from './components/Controls'
@@ -17,8 +17,14 @@ import './App.css'
 
 const path = `https://pokeapi.co/api/v2`
 const limit = 50
+const root = document.querySelector('html')
 
 export default function App() {
+	const [theme, setTheme] = useState(() => {
+		const theme = localStorage.getItem('theme') || 'light'
+		root.setAttribute('theme', theme)
+		return theme
+	})
 	const [allPokemon, setAllPokemon] = useState([])
 	const [favourites, setFavourites] = useState(() => {
 		const storedFavs = localStorage.getItem('favourites')
@@ -33,7 +39,7 @@ export default function App() {
 	const [modalData, setModalData] = useState(() => null)
 	const [pokemonToOpenInModal, setPokemonToOpenInModal] = useState(() => ({id: null, url: null, isOpen: false}))
 	const isDataFetched = !!allPokemon.length
-	// pokemon characters passed on to Results component for rendering
+	// matching pokemon characters passed on to Results component for rendering
 	const pokemon = useMemo(() => JSON.parse(JSON.stringify((() => {
 		// narrow down matches through filter by favourites
 		const matches = filterByFavourites ? allPokemon.filter(({id}) => favourites.some(favId => favId === id)) : allPokemon
@@ -98,6 +104,14 @@ export default function App() {
 		})
 	}
 
+	// theme
+	const toggleTheme = useCallback(() => setTheme(prev => {
+		const updatedTheme = prev === 'light' ? 'dark' : 'light'
+		localStorage.setItem('theme', updatedTheme)
+		root.setAttribute('theme', updatedTheme)
+		return updatedTheme
+	}), [])
+
 	// controls functions for search, filtering and sorting
 	const applyFilter = useCallback(name => setFilter(prev => ({...prev, [name]: !prev[name]})), [filter])
 	const filterByKeyword = keyword => setSearchKeyword(keyword)
@@ -117,44 +131,47 @@ export default function App() {
 	}
 
   	// modal functions for detailed view
-	const openModal = useCallback((id, url) => setPokemonToOpenInModal({id, url, isOpen: true}), [pokemonToOpenInModal.id])
+	const openModal = useCallback((id, url) => {
+		theme === 'dark' && maskScrollbar()
+		setPokemonToOpenInModal({id, url, isOpen: true})
+	}, [pokemonToOpenInModal.id])
 
 	return (
 		<div className="App">
-		<header>
-			<img src='./pokémon_logo.svg' alt="Pokémon" width="272.7" height="100" />
-			<Theme theme={true} />
-		</header>
-		<main>
-			{useMemo(() => <Controls
-				applyFilter={applyFilter}
-				filter={filter}
-				filterByKeyword={filterByKeyword}
-				handleSort={name => handleSort(name)}
-				sort={sort}
-				toggleFilterByFavourites={() => setFilterByFavourites(prev => !prev)}
-				types={types}
-			/>, [filter, sort, types])}
-			{useMemo(() => <Results
-				favourites={favourites}
-				filter={filter}
-				getAlias={getAlias}
-				isDataFetched={isDataFetched}
-				limit={limit}
-				offset={offset}
-				openModal={openModal}
-				pokemon={pokemon.slice(0, limit + offset)}
-				searchKeyword={searchKeyword}
-				sort={sort}
-				toggleFavourite={toggleFavourite}
-			/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
-			{isDataFetched && pokemon.length > offset + limit && <LoadMore
-				offset={offset}
-				updateOffset={updateOffset}
-			/>}
-		</main>
-		<footer>Probeaufgabe | Solongo</footer>
-		{useMemo(() => <DetailedView modalData={modalData} getAlias={getAlias} />, [modalData])}
+			<header>
+				<img src='./pokémon_logo.svg' alt="Pokémon" width="272.7" height="100" />
+				<Theme theme={theme} toggleTheme={toggleTheme} />
+			</header>
+			<main>
+				{useMemo(() => <Controls
+					applyFilter={applyFilter}
+					filter={filter}
+					filterByKeyword={filterByKeyword}
+					handleSort={name => handleSort(name)}
+					sort={sort}
+					toggleFilterByFavourites={() => setFilterByFavourites(prev => !prev)}
+					types={types}
+				/>, [filter, sort, types])}
+				{useMemo(() => <Results
+					favourites={favourites}
+					filter={filter}
+					getAlias={getAlias}
+					isDataFetched={isDataFetched}
+					limit={limit}
+					offset={offset}
+					openModal={openModal}
+					pokemon={pokemon.slice(0, limit + offset)}
+					searchKeyword={searchKeyword}
+					sort={sort}
+					toggleFavourite={toggleFavourite}
+				/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
+				{isDataFetched && pokemon.length > offset + limit && <LoadMore
+					offset={offset}
+					updateOffset={updateOffset}
+				/>}
+			</main>
+			<footer>Probeaufgabe | Solongo</footer>
+			{useMemo(() => <DetailedView modalData={modalData} getAlias={getAlias} />, [modalData])}
 		</div>
 	)
 }

@@ -1,5 +1,12 @@
 import { sun, moon } from './icons'
 
-export default function HeaderControls({theme}) {
-    return <button className="btn btn-primary theme" aria-label={theme ? 'helles Thema' : 'dunkles Thema'}>{theme ? sun : moon}</button>
-}
+const HeaderControls = ({theme, toggleTheme}) =>
+    <button
+        className="btn btn-primary theme-toggler"
+        aria-label={theme === 'light' ? 'helles Thema' : 'dunkles Thema'}
+        onClick={toggleTheme}
+    >
+        {theme === 'light' ? sun : moon}
+    </button>
+
+export default HeaderControls
