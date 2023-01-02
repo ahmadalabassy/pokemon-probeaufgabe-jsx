@@ -169,10 +169,7 @@ export default function App() {
 					isDataFetched={isDataFetched}
 					openModal={openModal}
 					pokemon={pokemon.slice(0, limit + offset)}
-					sort={sort}
 					toggleFavourite={toggleFavourite}
-					updateFilterControlActivity={bool => setActiveControls(prev => ({...prev, filter: bool}))}
-					updateSortControlActivity={bool => setActiveControls(prev => ({...prev, sort: bool}))}
 				/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
 				{isDataFetched && pokemon.length > offset + limit && <LoadMore
 					offset={offset}

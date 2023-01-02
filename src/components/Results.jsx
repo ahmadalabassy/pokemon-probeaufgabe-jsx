@@ -1,8 +1,8 @@
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import { addClass, removeClass, sortArr } from '../utils'
 import Pokemon from './Pokemon'
 
-export default function Results({areFiltersApplied, checkedSort, checkedTypes, favourites, filter, getAlias, isDataFetched, openModal, pokemon, sort, toggleFavourite}) {
+export default function Results({areFiltersApplied, checkedSort, checkedTypes, favourites, filter, getAlias, isDataFetched, openModal, pokemon, toggleFavourite}) {
 	const sectionRef = useRef(null)
 
 	const $pokemonElement = ({id, name, url}) => <Pokemon
