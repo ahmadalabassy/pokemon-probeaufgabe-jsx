@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { search, sliders, starFilled } from './icons'
 
 const sortAliases = [
@@ -7,7 +7,7 @@ const sortAliases = [
     {name: 'byType', alias: 'Nach Typ'}
 ]
 
-export default function Controls({applyFilter, filter, filterByKeyword, handleSort, sort, toggleFilterByFavourites, types}) {
+export default function Controls({activeControls, applyFilter, filter, filterByKeyword, handleSort, sort, toggleFilterByFavourites, types}) {
 
     // create React elements for Pokemon types
     const $typeOptions = useMemo(() => types.map(([name, alias]) =>
@@ -40,11 +40,41 @@ export default function Controls({applyFilter, filter, filterByKeyword, handleSo
         <>
             <div className="main-controls-header">
                 <div className="input-group searchbar">
-                    <span className="input-group-text" id="search-icon">{search}</span>
-                    <input type="text" className="form-control" id="search-input" aria-label="Suche" placeholder="Suche" onChange={event => filterByKeyword(event.target.value.toLowerCase().trim())}></input>
+                    <span
+                        activity={activeControls.keyword ? 'active' : 'inactive'}
+                        className="input-group-text"
+                        id="search-icon"
+                    >
+                        {search}
+                    </span>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="search-input"
+                        aria-label="Suche"
+                        placeholder="Suche"
+                        onChange={event => filterByKeyword(event.target.value.toLowerCase().trim())}
+                    ></input>
                 </div>
-                <button className="btn btn-primary favourites" onClick={toggleFilterByFavourites} aria-label="Fovoriten">{starFilled}</button>
-                <button className="btn btn-primary settings" data-bs-toggle="collapse" data-bs-target="#filterAndSortControls" aria-label="Einstellungen" aria-expanded="false" aria-controls="filterAndSortControls">{sliders}</button>
+                <button
+                    activity={activeControls.favourites ? 'active' : 'inactive'}
+                    className="btn btn-primary favourites"
+                    onClick={toggleFilterByFavourites}
+                    aria-label="Fovoriten"
+                >
+                    {starFilled}
+                </button>
+                <button
+                    activity={activeControls.filter || activeControls.sort ? 'active' : 'inactive'}
+                    className="btn btn-primary settings"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#filterAndSortControls"
+                    aria-label="Einstellungen"
+                    aria-expanded="false"
+                    aria-controls="filterAndSortControls"
+                >
+                    {sliders}
+                </button>
             </div>
             <div className="accordion collapse" id="filterAndSortControls">
                 <div className="accordion-item">

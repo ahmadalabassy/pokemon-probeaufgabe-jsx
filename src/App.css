@@ -206,6 +206,10 @@ footer {
     padding: .5em 1.5em;
 }
 
+:is(#search-icon, .favourites, .settings)[activity='active'] svg{
+    fill: var(--accent-secondary);
+}
+
 .bi-search {
     color: #fff;
 }

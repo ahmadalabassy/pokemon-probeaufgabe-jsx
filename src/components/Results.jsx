@@ -1,11 +1,9 @@
 import { useMemo, useRef } from 'react'
-import { addClass, getCheckedKeys, removeClass, sortArr } from '../utils'
+import { addClass, removeClass, sortArr } from '../utils'
 import Pokemon from './Pokemon'
 
-export default function Results({favourites, filter, getAlias, isDataFetched, openModal, pokemon, sort, toggleFavourite}) {
+export default function Results({areFiltersApplied, checkedSort, checkedTypes, favourites, filter, getAlias, isDataFetched, openModal, pokemon, sort, toggleFavourite}) {
 	const sectionRef = useRef(null)
-	const checkedTypes = useMemo(() => getCheckedKeys(filter), [filter])
-	const checkedSort = useMemo(() => getCheckedKeys(sort), [sort])
 
 	const $pokemonElement = ({id, name, url}) => <Pokemon
 		key={id}
@@ -21,7 +19,6 @@ export default function Results({favourites, filter, getAlias, isDataFetched, op
 	// create React elements for Pokemon characters
 	const $applyControls = () => {
 		addClass(sectionRef.current, "pokemon")
-		const areFiltersApplied = !!checkedTypes.length
 		const availableTypes = (areFiltersApplied ? checkedTypes : Object.keys(filter)).map(type => ({name: type, alias: getAlias(type)}))
 		let data = areFiltersApplied
 			? pokemon.filter(({types}) => checkedTypes.every(type => types.includes(type)))

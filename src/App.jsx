@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo,  useState } from 'react'
-import { getIdFromURL, sortArr } from './utils'
+import { getCheckedKeys, getIdFromURL, sortArr } from './utils'
 
 // Import components
 import Controls from './components/Controls'
@@ -26,29 +26,39 @@ export default function App() {
 		return theme
 	})
 	const [allPokemon, setAllPokemon] = useState([])
+	const [activeControls, setActiveControls] = useState(() => ({keyword: false, favourites: false, filter: false, sort: false}))
+	const [searchKeyword, setSearchKeyword] = useState('')
 	const [favourites, setFavourites] = useState(() => {
 		const storedFavs = localStorage.getItem('favourites')
 		return storedFavs ? JSON.parse(storedFavs) : []
 	})
 	const [types, setTypes] = useState([])
-	const [searchKeyword, setSearchKeyword] = useState('')
-	const [filterByFavourites, setFilterByFavourites] = useState(() => false)
 	const [filter, setFilter] = useState({})
 	const [sort, setSort] = useState(() => ({ascending: false, descending: false, byType: false}))
 	const [offset, setOffset] = useState(0)
 	const [modalData, setModalData] = useState(() => null)
 	const [pokemonToOpenInModal, setPokemonToOpenInModal] = useState(() => ({id: null, url: null, isOpen: false}))
 	const isDataFetched = !!allPokemon.length
+	const checkedTypes = useMemo(() => {
+		const checkedKeys = getCheckedKeys(filter)
+		setActiveControls(prev => ({...prev, filter: !!checkedKeys.length}))
+		return checkedKeys
+	}, [filter])
+	const checkedSort = useMemo(() => {
+		const checkedKeys = getCheckedKeys(sort)
+		setActiveControls(prev => ({...prev, sort: !!checkedKeys.length}))
+		return checkedKeys
+	}, [sort])
 	// matching pokemon characters passed on to Results component for rendering
 	const pokemon = useMemo(() => JSON.parse(JSON.stringify((() => {
 		// narrow down matches through filter by favourites
-		const matches = filterByFavourites ? allPokemon.filter(({id}) => favourites.some(favId => favId === id)) : allPokemon
+		const matches = activeControls.favourites ? allPokemon.filter(({id}) => favourites.some(favId => favId === id)) : allPokemon
 		// further narrow down matches through search by keyword
-		return (!!searchKeyword
+		return (activeControls.keyword
 			? matches.filter(({id, name, types}) =>
 				name.includes(searchKeyword) || types.includes(searchKeyword) || id.toString().includes(searchKeyword)) 
 			: matches)
-	})())), [allPokemon, favourites, filterByFavourites, searchKeyword])
+	})())), [allPokemon, favourites, activeControls.favourites, searchKeyword])
 
 	// fetch all pokemon characters and pokemon types at initial render
 	useEffect(() => {
@@ -114,7 +124,6 @@ export default function App() {
 
 	// controls functions for search, filtering and sorting
 	const applyFilter = useCallback(name => setFilter(prev => ({...prev, [name]: !prev[name]})), [filter])
-	const filterByKeyword = keyword => setSearchKeyword(keyword)
 	const getAlias = useCallback(name => types.find(([type]) => type === name)[1], [types])
 	const handleSort = useCallback(name => {
 		if(name === 'ascending') setSort(prev => ({...prev, [name]: !prev[name], descending: false}))
@@ -141,26 +150,29 @@ export default function App() {
 			</header>
 			<main>
 				{useMemo(() => <Controls
+					activeControls={activeControls}
 					applyFilter={applyFilter}
 					filter={filter}
-					filterByKeyword={filterByKeyword}
+					filterByKeyword={keyword => {setSearchKeyword(keyword); setActiveControls(prev => ({...prev, keyword: !!keyword}))}}
 					handleSort={name => handleSort(name)}
 					sort={sort}
-					toggleFilterByFavourites={() => setFilterByFavourites(prev => !prev)}
+					toggleFilterByFavourites={() => setActiveControls(prev => ({...prev, favourites: !prev.favourites}))}
 					types={types}
-				/>, [filter, sort, types])}
+				/>, [filter, sort, types, activeControls])}
 				{useMemo(() => <Results
+					areFiltersApplied={activeControls.filter}
+					checkedSort={checkedSort}
+					checkedTypes={checkedTypes}
 					favourites={favourites}
 					filter={filter}
 					getAlias={getAlias}
 					isDataFetched={isDataFetched}
-					limit={limit}
-					offset={offset}
 					openModal={openModal}
 					pokemon={pokemon.slice(0, limit + offset)}
-					searchKeyword={searchKeyword}
 					sort={sort}
 					toggleFavourite={toggleFavourite}
+					updateFilterControlActivity={bool => setActiveControls(prev => ({...prev, filter: bool}))}
+					updateSortControlActivity={bool => setActiveControls(prev => ({...prev, sort: bool}))}
 				/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
 				{isDataFetched && pokemon.length > offset + limit && <LoadMore
 					offset={offset}
