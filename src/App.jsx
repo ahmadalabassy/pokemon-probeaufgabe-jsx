@@ -41,11 +41,13 @@ export default function App() {
 	const isDataFetched = !!allPokemon.length
 	const checkedTypes = useMemo(() => {
 		const checkedKeys = getCheckedKeys(filter)
+		console.log(checkedKeys)
 		setActiveControls(prev => ({...prev, filter: !!checkedKeys.length}))
 		return checkedKeys
 	}, [filter])
 	const checkedSort = useMemo(() => {
 		const checkedKeys = getCheckedKeys(sort)
+		console.log(checkedKeys)
 		setActiveControls(prev => ({...prev, sort: !!checkedKeys.length}))
 		return checkedKeys
 	}, [sort])
@@ -58,7 +60,7 @@ export default function App() {
 			? matches.filter(({id, name, types}) =>
 				name.includes(searchKeyword) || types.includes(searchKeyword) || id.toString().includes(searchKeyword)) 
 			: matches)
-	})())), [allPokemon, favourites, activeControls.favourites, searchKeyword])
+	})())), [allPokemon, activeControls])
 
 	// fetch all pokemon characters and pokemon types at initial render
 	useEffect(() => {
@@ -170,7 +172,7 @@ export default function App() {
 					openModal={openModal}
 					pokemon={pokemon.slice(0, limit + offset)}
 					toggleFavourite={toggleFavourite}
-				/>, [allPokemon, favourites, filter, offset, pokemon, searchKeyword, sort])}
+				/>, [favourites, filter, offset, pokemon, searchKeyword, sort])}
 				{isDataFetched && pokemon.length > offset + limit && <LoadMore
 					offset={offset}
 					updateOffset={updateOffset}
