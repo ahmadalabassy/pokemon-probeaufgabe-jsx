@@ -12,6 +12,7 @@
     --character-bg: #ffcd053b;
     --drop-shadow: #C19F00;
     --footer-bg: var(--accent-primary);
+    --scrollbar-bg: rgb(0 0 0 / 0);
     --scrollbar-thumb: var(--accent-primary);
     --scrollbar-thumb-hover: var(--accent-primary-hover);
     --searchbar-box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
@@ -105,7 +106,7 @@ footer {
 
 /********** scrollbar styling **********/
 ::-webkit-scrollbar {
-    background-color: var(--bg);
+    background-color: var(--scrollbar-bg);
     width: 1rem;
     height: 1rem;
 }
@@ -117,7 +118,6 @@ footer {
 
 ::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
-    border: 3px solid var(--bg);
     border-radius: .5rem;
 }
 
@@ -125,9 +125,9 @@ footer {
     background-color: var(--scrollbar-thumb-hover);
 }
 
-@supports (scrollbar-color: var(--accent-primary) var(--bg)) {
+@supports (scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg)) {
     * {
-        scrollbar-color: var(--accent-primary) var(--bg);
+        scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
         scrollbar-width: auto;
     }
 }
@@ -233,6 +233,10 @@ footer {
 .searchbar:has(#search-input:focus) {
     box-shadow: var(--searchbar-box-shadow);
     border-radius: .375rem;
+}
+
+.searchbar {
+    height: 3rem;
 }
 
 #search-icon:has(+ #search-input:focus) {
@@ -388,6 +392,10 @@ footer {
 }
 
 /********** modal styling **********/
+:root[theme='dark'] button.btn-close {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
+}
+
 :root[theme='dark'] .modal-title {
     color: var(--accent-secondary);
 }
